@@ -1,4 +1,5 @@
 import {
+  BibleBookAbbr, //added for book shorthand
   BibleReferencePluginSettings,
   DEFAULT_SETTINGS,
   OutgoingLinkPositionEnum,
@@ -122,6 +123,7 @@ export class VerseSuggesting
     )
   }
 
+  /*
   protected getVerseReferenceLink(): string {
     let verseLink = ''
     if (
@@ -150,4 +152,32 @@ export class VerseSuggesting
     }
     return verseLink
   }
+  */
+  
+  // test this out to see if it works
+protected getVerseReferenceLink(): string {
+  // 1. Find the abbreviation for the book name.
+  // BibleBookAbbr is an array of [FullName, Abbreviation].
+  const bookAbbr =
+    BibleBookAbbr.find(
+      (book) => book[0] === this.verseReference.bookName
+    )?.[1] || this.verseReference.bookName;
+
+  // 2. Format the verse number(s), handling ranges like "16-17".
+  const verses = this.verseReference.verseNumberEnd
+    ? `${this.verseReference.verseNumber}-${this.verseReference.verseNumberEnd}`
+    : this.verseReference.verseNumber;
+
+  // 3. Get the Bible version's abbreviation (e.g., ESV).
+  const version = this.bibleVersion.toUpperCase();
+
+  // 4. Construct your custom string. The parent class adds `[!bible]` automatically,
+  // so we only need to build the part that comes after it.
+  // Final format: [Jhn# Ch. 3]:16 ESV
+  const finalString = ` [${bookAbbr}# Ch. ${this.verseReference.chapterNumber}]:${verses} ${version}`;
+
+  // 5. This method returns the link/header part of the reference.
+  return finalString;
+}
+  
 }
